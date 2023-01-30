@@ -1,0 +1,94 @@
+syntax = "proto3";
+package crypto_wallets;
+import "google/protobuf/empty.proto";
+
+
+message GetCryptoWalletsRequest{
+    string WalletId = 1;
+    string ClientId = 2; 
+    string Network = 3; 
+}
+
+message GetCryptoWalletsResponse{
+    string PublicAddress = 1;
+    optional string Tag = 2;
+    crypto_wallets.CryptoWalletsManagerResponseStatus Status = 3;
+}
+
+message GenerateOrderDepositWalletRequest{
+    string WalletId = 1;
+    string OrderId = 2;
+    string Network = 3; 
+}
+
+message GenerateMerchantDepositWalletRequest{
+    string WalletId = 1;
+    string Network = 2;
+    string MerchantId = 3;
+    string ClientHandleId = 4;
+}
+
+message GetMerchantExternalWallets{
+    string MerchantId = 1;
+}
+
+message CreateMerchantExternalWalletRequest{
+    string MerchantId = 1;
+    string AssetId = 2;
+    string Address = 3;
+    optional string Tag = 4;
+    string Network = 5;
+}
+
+message MerchantExternalWalletAssets{
+    string Asset = 1;
+    string Address = 2;
+    optional string Tag = 3;
+    string MerchantId = 4;
+    string Network = 5;
+}
+
+
+message MakeWithdrawalRequest{
+    string DestAddress = 1;
+    optional string DestTag = 2;
+    string AssetId = 3;
+    string Network = 4;
+    string Message = 5;
+    double Amount = 6;
+}
+
+message MakeWithdrawalResponse{
+    optional string ExternalId = 1;
+}
+
+enum CryptoWalletsManagerResponseStatus{
+    Ok = 0;
+    NotSupportedAsset = 1;
+}
+
+message FireblocksBridgeVaultWallet{
+    string VaultId = 1;
+    string Asset = 2;
+    double AvailableBalance = 3; 
+    optional double Balance = 4; 
+}
+
+message ExecuteTransactionGrcpRequest{
+    string VaultFrom = 1;
+    string VaultTo = 2;
+    string Asset = 3; 
+    double Amount = 4; 
+    optional string Message = 5;
+}
+
+service CryptoWalletsManager {
+    rpc GetClientDepositWallet(crypto_wallets.GetCryptoWalletsRequest) returns (crypto_wallets.GetCryptoWalletsResponse);
+    rpc GetOrderDepositWallet(crypto_wallets.GenerateOrderDepositWalletRequest) returns (crypto_wallets.GetCryptoWalletsResponse);
+    rpc GetMerchantDepositWallet(crypto_wallets.GenerateMerchantDepositWalletRequest) returns (crypto_wallets.GetCryptoWalletsResponse);
+    rpc GetMerchantExternalWalletsAssets(crypto_wallets.GetMerchantExternalWallets) returns (stream crypto_wallets.MerchantExternalWalletAssets);
+    rpc CreateMerchantExternalWallet(crypto_wallets.CreateMerchantExternalWalletRequest) returns (crypto_wallets.MerchantExternalWalletAssets);
+    rpc CreateWithdrawal(crypto_wallets.MakeWithdrawalRequest) returns (crypto_wallets.MakeWithdrawalResponse);
+    rpc GetVaultWallets(google.protobuf.Empty) returns (stream FireblocksBridgeVaultWallet);
+    rpc ExecuteTransaction(crypto_wallets.ExecuteTransactionGrcpRequest) returns (google.protobuf.Empty);
+}
